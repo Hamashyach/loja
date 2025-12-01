@@ -1,0 +1,136 @@
+@media print {
+    body > *:not(.recibo-print-container) {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    .recibo-print-container,
+    .recibo-print-container * {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .recibo-print-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    /* Configurações da página de impressão */
+    @page {
+        size: A4;
+        margin: 2cm;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+    }
+
+    .recibo-print-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    .recibo {
+        width: 100%;
+        font-family: 'Arial', sans-serif;
+        color: #000;
+        border: 2px solid #000;
+        padding: 20px;
+        box-sizing: border-box; 
+    }
+
+    .recibo-header {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: flex-start; 
+        border-bottom: 1px solid #000;
+        padding-bottom: 15px;
+        gap: 15px; 
+    }
+
+    .recibo-logo {
+        flex: 0 0 100px; 
+    }
+    .recibo-logo img {
+        height: 120px;
+    }
+    .recibo-empresa {
+        flex: 1;
+        text-align: center;
+    }
+    .recibo-empresa p {
+        margin: 2px 0;
+        font-size: 11pt;
+    }
+
+   .recibo-numero-valor {
+        flex: 0 0 150px; 
+        border: 1px solid #000;
+    }
+  .recibo-numero-valor .numero, .recibo-numero-valor .valor {
+        padding: 5px 10px;
+        text-align: center;
+    }
+    .recibo-numero-valor .numero {
+        border-bottom: 1px solid #000;
+    }
+    .recibo-numero-valor p {
+        margin: 0;
+        font-size: 9pt;
+    }
+    .recibo-numero-valor span {
+        font-size: 14pt;
+        font-weight: bold;
+    }
+    
+    .recibo-body {
+        padding: 25px 5px;
+        font-size: 12pt;
+        line-height: 1.6;
+    }
+
+    .servicos-lista {
+        min-height: 80px; 
+        padding-left: 20px;
+    }
+    .servicos-lista p {
+        margin: 5px 0;
+    }
+
+    .recibo-footer {
+        padding-top: 30px;
+        display: flex;
+        justify-content:center; 
+    }
+
+    .data-local {
+        text-align: right;
+        font-size: 12pt;
+        margin-bottom: 60px;
+    }
+
+  /* .assinaturas {
+        display: flex; 
+        justify-content:center; 
+    } */
+    
+   .assinatura-block {
+        width: 45%; 
+        text-align: center;
+        font-size: 10pt;
+    }
+    .assinatura-block p {
+        margin: 2px 0;
+    }
+    .assinatura-linha {
+        color: #000;
+    }
+} 
+
+

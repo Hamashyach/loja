@@ -1,0 +1,263 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #000000; 
+    color: #ffffff;           
+    line-height: 1.6;
+}
+
+a {
+    color: #bb9a65; 
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    width: 360px;
+    padding: 2.5rem;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.login-container h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 200px;
+    background-color: #1a1a1a;
+    border-right: 1px solid #333;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh; 
+    z-index: 10;
+}
+
+.admin-sidebar .logo img{
+    height: 60px;
+    margin-bottom: 20px;
+}
+
+.admin-nav a {
+    display: block;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    color: #f0f0f0;
+    border-radius: 6px;
+    font-weight: 500;
+}
+.admin-nav a:hover {
+    background-color: #252525;
+    text-decoration: none;
+}
+.admin-nav a.active {
+    background-color: #333;
+    color: #fff;
+}
+
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: 200px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #333;
+}
+
+.admin-user-info {
+    font-weight: 500;
+}
+.admin-user-info a {
+    color: #bb9a65;
+    margin-left: 1rem;
+    font-weight: bold;
+}
+
+.admin-content {
+    padding: 2rem;
+}
+
+.admin-content h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+}
+
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #ccc;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #111;
+    border: 1px solid #444;
+    color: #f0f0f0;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+.form-control:focus {
+    outline: none;
+    border-color: #bb9a65;
+    box-shadow: 0 0 0 3px rgba(187, 154, 101, 0.3);
+}
+
+
+.admin-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background-color: #bb9a65;
+    color: #000000;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+.admin-btn:hover {
+    background-color: #a98a54;
+}
+
+
+.admin-alert {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 1px solid;
+}
+.admin-alert.error {
+    background-color: #4a2020;
+    color: #f5c5c5;
+    border-color: #e64c4c;
+}
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.is-open .modal-container {
+    transform: scale(1);
+}
+
+.modal-container h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+.modal-container p {
+    color: #ccc;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.modal-btn-ok {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #000;
+    background-color: var(--color-accent, #bb9a65);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.modal-btn-cancel {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #555;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.modal-btn-cancel:hover {
+    background-color: #777;
+}
