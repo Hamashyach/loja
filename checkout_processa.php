@@ -4,150 +4,167 @@ require 'bd/config.php';
 
 header('Content-Type: application/json');
 
-$mp_access_token = 'APP_USR-7259438993484884-120114-6fc14ac7f6ba9ebe2a5e501f184247cf-3032062927'; 
-
-$pasta_projeto = "/LionCompany"; 
-// CORREÇÃO: Usar ':' e não '=>' na URL
-$base_url = "http://127.0.0.1" . $pasta_projeto;
-
+// VERIFICAÇÕES 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    // CORREÇÃO: Sintaxe do header
-    header("Location: carrinho.php");
+    echo json_encode(['sucesso' => false, 'msg' => 'Método inválido']);
     exit;
 }
 
-// Coleta Dados Básicos 
-$cliente_id = $_SESSION['cliente_id'];
-$endereco_id = $_POST['endereco_id'];
-$valor_produtos = (float)$_POST['valor_produtos'];
-$valor_frete = (float)$_POST['valor_frete'];
-$tipo_frete = $_POST['tipo_frete'];
+$cliente_id = $_SESSION['cliente_id'] ?? null;
+if (!$cliente_id) { echo json_encode(['sucesso' => false, 'msg' => 'Sessão expirada.']); exit; }
 
-// CORREÇÃO: Lógica ternária correta (? :) em vez de (??)
-$frete_servico_id = !empty($_POST['frete_servico_id']) ? (int)$_POST['frete_servico_id'] : null;
-$valor_total = $valor_produtos + $valor_frete;
+if (empty($_SESSION['carrinho'])) {
+    echo json_encode(['sucesso' => false, 'msg' => 'Carrinho vazio.']);
+    exit;
+}
 
-// Dados Específicos do Checkout Transparente 
-$token_cartao = $_POST['token'] ?? null;
-$payment_method_id = $_POST['paymentMethodId'] ?? null; 
-$issuer_id = $_POST['issuer'] ?? null; 
-$installments = $_POST['installments'] ?? 1; 
+// DADOS DO POST
+$endereco_id = filter_input(INPUT_POST, 'endereco_id', FILTER_SANITIZE_NUMBER_INT);
+$valor_frete = filter_input(INPUT_POST, 'valor_frete', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+$frete_servico_id = $_POST['frete_servico_id'] ?? null;
+$tipo_frete = $_POST['tipo_frete'] ?? 'Envio';
 
-// Busca Endereço e Cliente
-$stmt_end = $pdo->prepare("SELECT * FROM tb_client_addresses WHERE id = ?");
-$stmt_end->execute([$endereco_id]);
-$end = $stmt_end->fetch();
+//  BUSCA CLIENTE E ENDEREÇO 
+$stmt = $pdo->prepare("SELECT * FROM tb_client_users WHERE id = ?");
+$stmt->execute([$cliente_id]);
+$cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$stmt_cli = $pdo->prepare("SELECT cliente_nome, cliente_sobrenome, cliente_email, cliente_cpf FROM tb_client_users WHERE id = ?");
-$stmt_cli->execute([$cliente_id]);
-$cliente_dados = $stmt_cli->fetch();
+$stmt = $pdo->prepare("SELECT * FROM tb_client_addresses WHERE id = ?");
+$stmt->execute([$endereco_id]);
+$end = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$cliente || !$end) {
+    echo json_encode(['sucesso' => false, 'msg' => 'Dados incompletos.']);
+    exit;
+}
+
+// PREPARA ITENS PARA O MERCADO PAGO 
+$total_produtos = 0;
+$items_mp = [];
+
+foreach ($_SESSION['carrinho'] as $prod_id => $item_carrinho) {
+    $prod_id = $item_carrinho['id'];
+    $stmt_p = $pdo->prepare("SELECT id, nome, preco, preco_promocional FROM tb_produtos WHERE id = ?");
+    $stmt_p->execute([$prod_id]);
+    $prod = $stmt_p->fetch(PDO::FETCH_ASSOC);
+    
+    if ($prod) {
+        $preco_unitario = ($prod['preco_promocional'] > 0) ? (float)$prod['preco_promocional'] : (float)$prod['preco'];
+        $quantidade = (int)$item_carrinho['quantidade'];
+        $total_produtos += $preco_unitario * $quantidade;
+        
+ 
+        $items_mp[] = [
+            "id" => (string)$prod['id'],
+            "title" => $prod['nome'] . " (" . ($item_carrinho['cor']??'') . " - " . ($item_carrinho['tamanho']??'') . ")",
+            "description" => "Produto ID: " . $prod['id'],
+            "quantity" => $quantidade,
+            "unit_price" => $preco_unitario,
+            "currency_id" => "BRL"
+        ];
+    }
+}
+
+// Adiciona Frete como Item 
+if ($valor_frete > 0) {
+    $items_mp[] = [
+        "id" => "FRETE",
+        "title" => "Frete - " . $tipo_frete,
+        "quantity" => 1,
+        "unit_price" => (float)$valor_frete,
+        "currency_id" => "BRL"
+    ];
+}
+
+$valor_total_pedido = $total_produtos + $valor_frete;
 
 try {
     $pdo->beginTransaction();
 
-    // Cria o Pedido no Banco (Status Pendente)
-    $sql_pedido = "INSERT INTO tb_pedidos 
+    // CRIA PEDIDO NO BANCO (PENDENTE) 
+    $sql = "INSERT INTO tb_pedidos 
         (cliente_id, valor_total, frete_servico_id, status_pagamento, status_entrega, metodo_pagamento, entrega_cep, entrega_endereco, entrega_numero, entrega_bairro, entrega_cidade, entrega_estado) 
-        VALUES (?, ?, ?, 'Pendente', 'Nao Enviado', ?, ?, ?, ?, ?, ?, ?)";
+        VALUES (?, ?, ?, 'Pendente', 'Nao Enviado', 'Checkout Pro', ?, ?, ?, ?, ?, ?)";
     
-    // CORREÇÃO: Lógica ternária para o nome do método
-    $metodo_nome = ($payment_method_id == 'pix') ? 'Pix' : 'Cartão';
-
-    $stmt = $pdo->prepare($sql_pedido);
+    $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        $cliente_id, $valor_total, $frete_servico_id, $metodo_nome,
+        $cliente_id, $valor_total_pedido, $frete_servico_id, 
         $end['cep'], $end['endereco'], $end['numero'], $end['bairro'], $end['cidade'], $end['estado']
     ]);
     $pedido_id = $pdo->lastInsertId();
 
-    // Salva Itens
-    foreach ($_SESSION['carrinho'] as $prod_id => $item) {
-        $stmt_prod = $pdo->prepare("SELECT preco, preco_promocional FROM tb_produtos WHERE id = ?");
-        $stmt_prod->execute([$prod_id]);
-        $prod = $stmt_prod->fetch();
+    // Salva Itens no Banco
+    foreach ($items_mp as $index => $item) {
+        if ($item['id'] === 'FRETE') continue; 
+
+        $prod_id_real = $item['id']; 
         
-        // CORREÇÃO: Lógica de preço
-        $preco = ($prod['preco_promocional'] > 0) ? $prod['preco_promocional'] : $prod['preco'];
+        $sessao_item = $_SESSION['carrinho'][$prod_id_real] ?? [];
+        $tamanho = $sessao_item['tamanho'] ?? 'Padrão';
+        $cor = $sessao_item['cor'] ?? 'Padrão';
         
-        $pdo->prepare("INSERT INTO tb_itens_pedido (pedido_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)")
-            ->execute([$pedido_id, $prod_id, $item['quantidade'], $preco]);
+        $pdo->prepare("INSERT INTO tb_itens_pedido (pedido_id, produto_id, quantidade, preco_unitario, tamanho, cor) VALUES (?, ?, ?, ?, ?, ?)")
+            ->execute([
+                $pedido_id, 
+                $prod_id_real, 
+                $item['quantity'], 
+                $item['unit_price'],
+                $tamanho,
+                $cor
+            ]);
     }
+    
     $pdo->commit();
 
-    // ==========================================================================
-    // 🚀 MONTAGEM DO JSON (API de Orders)
-    // ==========================================================================
-
-    // Define o tipo
-    $tipo_pagamento = ($payment_method_id == 'pix') ? 'bank_transfer' : 'credit_card';
-    
-    // Dados do Pagamento (dentro da transação)
-    $payment_data = [
-        "amount" => number_format($valor_total, 2, '.', ''), 
-        "payment_method" => [
-            "id" => $payment_method_id, 
-            "type" => $tipo_pagamento   
-        ]
-    ];
-
-    if ($payment_method_id != 'pix') {
-        $payment_data["token"] = $token_cartao;
-        $payment_data["installments"] = (int)$installments;
-        $payment_data["issuer_id"] = (int)$issuer_id;
-    }
-
-    // Estrutura Principal da Order
-    $payload = [
-        "type" => "online",
-        "processing_mode" => "automatic",
-        "external_reference" => (string)$pedido_id,
-        "total_amount" => number_format($valor_total, 2, '.', ''), // Valor total na raiz
-        "transactions" => [
-            "payments" => [ $payment_data ] 
-        ],
+    // CRIA PREFERÊNCIA MP 
+    $preference_data = [
+        "items" => $items_mp,
         "payer" => [
-            "email" => $cliente_dados['cliente_email'],
-            "entity_type" => "individual",
+            "name" => $cliente['cliente_nome'],
+            "surname" => $cliente['cliente_sobrenome'],
+            "email" => $cliente['cliente_email'],
             "identification" => [
                 "type" => "CPF",
-                "number" => preg_replace('/[^0-9]/', '', $cliente_dados['cliente_cpf'])
+                "number" => preg_replace('/[^0-9]/', '', $cliente['cliente_cpf'] ?? '')
+            ],
+            // Endereço do pagador 
+            "address" => [
+                "street_name" => $end['endereco'],
+                "street_number" => (int)$end['numero'],
+                "zip_code" => preg_replace('/[^0-9]/', '', $end['cep'])
             ]
         ],
-        // CORREÇÃO: Estrutura do array shipment consertada
-        "shipment" => [
-            "address" => [
-                "zip_code" => $end['cep'],
-                "street_name" => $end['endereco'],
-                "street_number" => (string)$end['numero'],
-                "neighborhood" => $end['bairro'],
-                "city" => $end['cidade'],
-                "state_name" => $end['estado']
-                // "complement" => $end['complemento']
-            ]
-        ]
+        // CONFIGURAÇÃO DE PAGAMENTO
+        "payment_methods" => [
+            "excluded_payment_types" => [
+                ["id" => "ticket"] 
+            ],
+            "installments" => 12
+        ],
+        "back_urls" => [
+            "success" => BASE_URL . "/pedido_sucesso.php",
+            "failure" => BASE_URL . "/perfil.php",
+            "pending" => BASE_URL . "/pedido_sucesso.php"
+        ],
+        "auto_return" => "approved",
+        "external_reference" => (string)$pedido_id,
+        "statement_descriptor" => "LION STORE", 
+        "expires" => true,
+        "expiration_date_to" => date('Y-m-d\TH:i:s.000-03:00', strtotime('+24 hours'))
     ];
 
-    // CORREÇÃO: Data de expiração na raiz do payload (se for Pix)
-    if ($payment_method_id == 'pix') {
-        // Formato correto ISO 8601 com ':' e não '=>'
-        $payload["expiration_time"] = date('Y-m-d\TH:i:s.000-03:00', strtotime('+24 hours'));
-    }
-
-    // Envio para a API
+    // Envio cURL
     $curl = curl_init();
-
     curl_setopt_array($curl, [
-        // CORREÇÃO: URL e Headers com sintaxe correta
-        CURLOPT_URL => "https://api.mercadopago.com/v1/orders",
+        CURLOPT_URL => "https://api.mercadopago.com/checkout/preferences",
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($preference_data),
         CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer " . $mp_access_token,
-            "Content-Type: application/json",
-            "X-Idempotency-Key: " . uniqid('', true)
+            "Authorization: Bearer " . MP_ACCESS_TOKEN,
+            "Content-Type: application/json"
         ],
-        CURLOPT_SSL_VERIFYPEER => false 
+        CURLOPT_SSL_VERIFYPEER => false // Sandbox = false
     ]);
 
     $response = curl_exec($curl);
@@ -155,51 +172,30 @@ try {
     curl_close($curl);
 
     if ($err) {
-        // Retorna erro em JSON para o front tratar
-        echo json_encode(['erro' => true, 'msg' => "Erro cURL: $err"]);
+        echo json_encode(['sucesso' => false, 'msg' => 'Erro cURL: ' . $err]);
         exit;
     }
 
     $retorno = json_decode($response, true);
 
-    // Verifica Sucesso
-    if (isset($retorno['status']) && ($retorno['status'] == 'processed' || $retorno['status'] == 'open' || $retorno['status'] == 'closed')) {
+    if (isset($retorno['init_point'])) {
+        $link = (strpos(MP_ACCESS_TOKEN, 'TEST') === 0) ? $retorno['sandbox_init_point'] : $retorno['init_point'];
         
-        $pagamento = $retorno['transactions'][0]['payments'][0] ?? [];
-        $status_pag = $pagamento['status'] ?? 'pending';
-        
-        // Atualiza banco
-        $pdo->prepare("UPDATE tb_pedidos SET status_pagamento = ? WHERE id = ?")
-            ->execute([$status_pag, $pedido_id]);
-
         unset($_SESSION['carrinho']);
 
-        // Se for Pix, retorna o QR Code para o front-end
-        if ($payment_method_id == 'pix') {
-            $qr_code = $pagamento['transaction_details']['qr_code'] ?? null; 
-            $qr_code_base64 = $pagamento['transaction_details']['qr_code_base64'] ?? null;
-            
-            // Salva na sessão para exibir na próxima tela
-            $_SESSION['pix_copia_cola'] = $qr_code;
-            $_SESSION['pix_imagem'] = $qr_code_base64;
-            
-            header("Location: " . $base_url . "/pedido_pix.php?id=$pedido_id");
-        } else {
-            header("Location: " . $base_url . "/perfil.php?sucesso=pedido_realizado");
-        }
-        exit;
-
+        echo json_encode([
+            'sucesso' => true,
+            'redirect' => $link
+        ]);
     } else {
-        // Exibe erro na tela
-        echo "<h2>Erro na API de Orders</h2>";
-        echo "<pre>"; print_r($retorno); echo "</pre>";
-        echo "<p>JSON Enviado:</p>";
-        echo "<pre>"; echo json_encode($payload, JSON_PRETTY_PRINT); echo "</pre>";
-        exit;
+        $msg = $retorno['message'] ?? 'Erro ao criar preferência MP.';
+        // Debug  se der erro
+        if(isset($retorno['cause'])) $msg .= ' - ' . json_encode($retorno['cause']);
+        echo json_encode(['sucesso' => false, 'msg' => $msg]);
     }
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    die("Erro interno: " . $e->getMessage());
+    echo json_encode(['sucesso' => false, 'msg' => 'Erro interno: ' . $e->getMessage()]);
 }
 ?>
