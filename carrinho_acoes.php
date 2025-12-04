@@ -20,9 +20,10 @@ $response = ['sucesso' => false, 'mensagem' => '', 'nova_contagem' => 0];
 // --- ADICIONAR ---
 if ($acao == 'adicionar') {
     $produto_id = (int)($_POST['produto_id'] ?? 0);
+    $produto_variacao_id = (int)($_POST['produto_varicao_id']);
     $quantidade = (int)($_POST['quantidade'] ?? 1);
 
-    if ($produto_id > 0 && $quantidade > 0) {
+    if ($produto_id || $produto_variacao_id > 0 && $quantidade > 0) {
         if (isset($_SESSION['carrinho'][$produto_id])) {
             $_SESSION['carrinho'][$produto_id]['quantidade'] += $quantidade;
         } else {
@@ -64,8 +65,6 @@ if ($acao == 'atualizar') {
             unset($_SESSION['carrinho'][$produto_id]);
         }
     }
-    
-    // CORREÇÃO AQUI: Só redireciona se NÃO for AJAX
     if (!$is_ajax) {
         header("Location: carrinho.php");
         exit;

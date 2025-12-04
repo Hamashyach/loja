@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cidade = $_POST['cidade'] ?? '';
     $estado = $_POST['estado'] ?? '';
 
-    // Validações (simplificado)
+    // Validações 
     if (empty($nome) || empty($email) || empty($contato) ||empty($cpf) || empty($senha_digitada) || empty($cep) || empty($endereco)) {
         die("Por favor, preencha todos os campos obrigatórios.");
     }
