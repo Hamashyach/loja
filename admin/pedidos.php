@@ -89,32 +89,38 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                     </thead>
                     <tbody>
                         <?php if (empty($pedidos)): ?>
-                            <tr>
-                                <td colspan="7" style="text-align:center; color: #050505ff">Nenhum pedido recebido ainda.</td>
-                            </tr>
+                            <tr><td colspan="6">Nenhum pedido encontrado.</td></tr>
                         <?php else: ?>
                             <?php foreach ($pedidos as $pedido): ?>
                                 <tr>
                                     <td>#<?php echo $pedido['id']; ?></td>
-                                    <td><?php echo date('d/m/Y H:i', strtotime($pedido['data_pedido'])); ?></td>
                                     <td><?php echo htmlspecialchars($pedido['cliente_nome'] . ' ' . $pedido['cliente_sobrenome']); ?></td>
+                                    <td><?php echo date('d/m/Y H:i', strtotime($pedido['data_pedido'])); ?></td>
                                     <td>R$ <?php echo number_format($pedido['valor_total'], 2, ',', '.'); ?></td>
+                                    
                                     <td>
-                                        <?php if ($pedido['status_pagamento'] == 'Aguardando Pagamento'): ?>
-                                            <span class="status status-aguardando">Aguardando</span>
+                                        <?php 
+                                            $st = strtolower($pedido['status_pagamento']); // Converte para minúsculo para comparar
+                                            if ($st == 'pago' || $st == 'approved' || $st == 'accredited'): 
+                                        ?>
+                                            <span class="status status-pago" style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:4px;">Pago</span>
                                         <?php else: ?>
-                                            <span class="status status-pago">Pago</span>
+                                            <span class="status status-aguardando" style="background:#fff3cd; color:#856404; padding:5px 10px; border-radius:4px;">
+                                                <?php echo $pedido['status_pagamento']; // Mostra o status real (Pendente, Aguardando, etc) ?>
+                                            </span>
                                         <?php endif; ?>
                                     </td>
+
                                     <td>
-                                        <?php if ($pedido['status_entrega'] == 'Nao Enviado'): ?>
-                                            <span class="status status-nao-enviado">Não Enviado</span>
+                                        <?php if ($pedido['status_entrega'] == 'Enviado' || $pedido['status_entrega'] == 'Etiqueta Gerada'): ?>
+                                            <span class="status status-enviado" style="background:#cce5ff; color:#004085; padding:5px 10px; border-radius:4px;"><?php echo $pedido['status_entrega']; ?></span>
                                         <?php else: ?>
-                                            <span class="status status-enviado">Enviado</span>
+                                            <span class="status status-nao-enviado" style="background:#f8d7da; color:#721c24; padding:5px 10px; border-radius:4px;">Não Enviado</span>
                                         <?php endif; ?>
                                     </td>
+                                    
                                     <td class="acoes">
-                                        <a href="pedido-detalhe.php?id=<?php echo $pedido['id']; ?>">Ver Detalhes</a>
+                                        <a href="pedido-detalhe.php?id=<?php echo $pedido['id']; ?>" style="color:#007bff; text-decoration:none;">Ver Detalhes</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

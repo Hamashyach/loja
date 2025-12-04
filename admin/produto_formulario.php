@@ -8,7 +8,7 @@ $produto = [
     'nome' => '', 'descricao' => '', 'cuidados' => '', 'preco' => '', 'preco_promocional' => '',
     'sku' => '', 'estoque' => 0, 'categoria_id' => null, 'marca_id' => null,
     'imagem_principal' => null, 'ativo' => 1, 'em_destaque_kit' => 0,
-    'peso_kg' => '0.300', 'altura_cm' => '5', 'largura_cm' => '20', 'comprimento_cm' => '20'
+    'peso' => '0.300', 'altura' => '5', 'largura' => '20', 'comprimento' => '20'
 ];
 
 $titulo_pagina = "Adicionar Novo Produto";
@@ -180,10 +180,10 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
 
                 <h3 style="margin-top: 30px; color: var(--text-main); border-bottom: 1px solid #333; padding-bottom: 10px;">Informações para o cálculo de frete</h3>
                 <div class="form-grid" style="grid-template-columns: repeat(4, 1fr);">
-                    <div class="form-group"><label>Peso (kg)</label><input type="number" step="0.001" name="peso_kg" class="form-control" value="<?php echo htmlspecialchars($produto['peso_kg']); ?>"></div>
-                    <div class="form-group"><label>Altura (cm)</label><input type="number" name="altura_cm" class="form-control" value="<?php echo htmlspecialchars($produto['altura_cm']); ?>"></div>
-                    <div class="form-group"><label>Largura (cm)</label><input type="number" name="largura_cm" class="form-control" value="<?php echo htmlspecialchars($produto['largura_cm']); ?>"></div>
-                    <div class="form-group"><label>Comp. (cm)</label><input type="number" name="comprimento_cm" class="form-control" value="<?php echo htmlspecialchars($produto['comprimento_cm']); ?>"></div>
+                    <div class="form-group"><label>Peso (kg)</label><input type="number" step="0.001" name="peso" class="form-control" value="<?php echo htmlspecialchars($produto['peso']); ?>"></div>
+                    <div class="form-group"><label>Altura (cm)</label><input type="number" name="altura" class="form-control" value="<?php echo htmlspecialchars($produto['altura']); ?>"></div>
+                    <div class="form-group"><label>Largura (cm)</label><input type="number" name="largura" class="form-control" value="<?php echo htmlspecialchars($produto['largura']); ?>"></div>
+                    <div class="form-group"><label>Comp. (cm)</label><input type="number" name="comprimento" class="form-control" value="<?php echo htmlspecialchars($produto['comprimento']); ?>"></div>
                 </div>
 
                 <h3 style="margin-top: 30px; color: var(----text-main); border-bottom: 1px solid #333; padding-bottom: 10px;">Variações (Cores e Tamanhos)</h3>

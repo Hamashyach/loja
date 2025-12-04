@@ -37,7 +37,7 @@
                 <h4>Contato</h4>
                 <div class="contato">
                 
-                        <p>Av. Adolfo Mofithinho 395<br>
+                        <p>Av. Adolfo Moitinho 395<br>
                         Irecê, BA</p>
                     </div>
                     <div class="contatos">

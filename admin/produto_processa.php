@@ -37,10 +37,10 @@ $marca_id = !empty($_POST['marca_id']) ? $_POST['marca_id'] : null;
 $ativo = $_POST['ativo'] ?? 0;
 $em_destaque_kit = isset($_POST['em_destaque_kit']) ? 1 : 0;
 
-$peso_kg = str_replace(',', '.', $_POST['peso_kg'] ?? '0.300');
-$altura_cm = (int)($_POST['altura_cm'] ?? 5);
-$largura_cm = (int)($_POST['largura_cm'] ?? 20);
-$comprimento_cm = (int)($_POST['comprimento_cm'] ?? 20);
+$peso = str_replace(',', '.', $_POST['peso'] ?? '0.300');
+$altura = (int)($_POST['altura'] ?? 5);
+$largura = (int)($_POST['largura'] ?? 20);
+$comprimento = (int)($_POST['comprimento'] ?? 20);
 
 // --- PROCESSAR VARIAÇÕES E IMAGENS ---
 $variacoes_post = $_POST['variacoes'] ?? [];
@@ -89,13 +89,13 @@ try {
     $produto_id = $produto_id_get;
 
     if ($acao == 'novo') {
-        $sql = "INSERT INTO tb_produtos (nome, descricao, cuidados, preco, preco_promocional, sku, estoque, categoria_id, marca_id, ativo, em_destaque_kit, peso_kg, altura_cm, largura_cm, comprimento_cm, imagem_principal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO tb_produtos (nome, descricao, cuidados, preco, preco_promocional, sku, estoque, categoria_id, marca_id, ativo, em_destaque_kit, peso, altura, largura, comprimento, imagem_principal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$nome, $descricao, $cuidados, $preco, $preco_promocional, $sku, $estoque_total_calculado, $categoria_id, $marca_id, $ativo, $em_destaque_kit, $peso_kg, $altura_cm, $largura_cm, $comprimento_cm, $imagem_nome_db]);
+        $stmt->execute([$nome, $descricao, $cuidados, $preco, $preco_promocional, $sku, $estoque_total_calculado, $categoria_id, $marca_id, $ativo, $em_destaque_kit, $peso, $altura, $largura, $comprimento, $imagem_nome_db]);
         $produto_id = $pdo->lastInsertId();
     } elseif ($acao == 'editar' && $produto_id) {
-        $sql = "UPDATE tb_produtos SET nome=?, descricao=?, cuidados=?, preco=?, preco_promocional=?, sku=?, estoque=?, categoria_id=?, marca_id=?, ativo=?, em_destaque_kit=?, peso_kg=?, altura_cm=?, largura_cm=?, comprimento_cm=?";
-        $params = [$nome, $descricao, $cuidados, $preco, $preco_promocional, $sku, $estoque_total_calculado, $categoria_id, $marca_id, $ativo, $em_destaque_kit, $peso_kg, $altura_cm, $largura_cm, $comprimento_cm];
+        $sql = "UPDATE tb_produtos SET nome=?, descricao=?, cuidados=?, preco=?, preco_promocional=?, sku=?, estoque=?, categoria_id=?, marca_id=?, ativo=?, em_destaque_kit=?, peso=?, altura=?, largura=?, comprimento=?";
+        $params = [$nome, $descricao, $cuidados, $preco, $preco_promocional, $sku, $estoque_total_calculado, $categoria_id, $marca_id, $ativo, $em_destaque_kit, $peso, $altura, $largura, $comprimento];
         
         if ($imagem_nome_db) {
             $sql .= ", imagem_principal=?";
