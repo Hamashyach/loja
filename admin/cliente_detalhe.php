@@ -55,29 +55,25 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             gap: 30px;
         }
         .box {
-            background-color: #1a1a1a; padding: 1.5rem;
-            border-radius: 8px; border: 1px solid #333;
+            background-color: #ffffffff; padding: 1.5rem;
+            border-radius: 8px; border: 1px solid #c2c2c2;
         }
         .box h2 {
-            font-size: 1.3rem; color: var(--color-accent, #bb9a65);
-            border-bottom: 1px solid #444;
+            font-size: 1.3rem; color: var(--text-main);
+            border-bottom: 1px solid #c2c2c2;
             padding-bottom: 10px; margin-bottom: 20px;
         }
         
         /* Lista de Detalhes */
         .details-list p {
-            font-size: 0.95rem; color: #ccc;
+            font-size: 0.95rem; color: #000000ff;
             line-height: 1.7; margin-bottom: 10px;
         }
-        .details-list p strong { color: #fff; }
-        .details-list .status-ativo { color: #28a745; font-weight: bold; }
-        .details-list .status-inativo { color: #e64c4c; font-weight: bold; }
+        .details-list p strong { color: #000000ff; }
+        .details-list .status-ativo { color: #28a745; font-weight: 600; }
+        .details-list .status-inativo { color: #e64c4c; font-weight: 600; }
         
         /* Tabela de Pedidos */
-        .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
-        .data-table th { font-size: 0.9rem; }
-        .data-table .acoes a { color: #bb9a65; }
         .status-aguardando { color: #a98a54; }
         .status-pago { color: #28a745; }
     </style>
@@ -108,7 +104,9 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             </header>
 
             <main class="admin-content">
-                <h1><?php echo htmlspecialchars($cliente['cliente_nome'] . ' ' . $cliente['cliente_sobrenome']); ?></h1>
+                <h1><?php echo htmlspecialchars($cliente['cliente_nome'] . ' ' . $cliente['cliente_sobrenome']); ?>
+                    <a href="clientes.php" class="btn-novo">Voltar</a>
+                </h1>
                 
                 <div class="details-layout">
                     
@@ -132,7 +130,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                         <div class="box" style="margin-top: 20px;">
                             <h2>Endereços</h2>
                             <?php if (empty($enderecos)): ?>
-                                <p style="color: #888;">Nenhum endereço cadastrado.</p>
+                                <p style="color: #000000ff;">Nenhum endereço cadastrado.</p>
                             <?php else: ?>
                                 <?php foreach ($enderecos as $endereco): ?>
                                     <div class="details-list" style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px;">
@@ -161,7 +159,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                             </thead>
                             <tbody>
                                 <?php if (empty($pedidos)): ?>
-                                    <tr><td colspan="5" style="text-align:center; color: #888;">Nenhum pedido realizado por este cliente.</td></tr>
+                                    <tr><td colspan="5" style="text-align:center; color: #000000ff;">Nenhum pedido realizado por este cliente.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($pedidos as $pedido): ?>
                                         <tr>

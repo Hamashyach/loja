@@ -3,8 +3,6 @@ require_once 'auth_check.php';
 require_once '../bd/config.php';
 
 try {
-    // Vamos buscar os pedidos e juntar (JOIN) com a tabela de clientes
-    // para podermos mostrar o nome do cliente.
     $sql = "SELECT 
                 p.id, 
                 p.valor_total, 
@@ -37,11 +35,6 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
     <title>Gerenciar Pedidos - Painel Admin</title>
     <link rel="stylesheet" href="css/admin_style.css">
     <style>
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background-color: #1a1a1a; }
-        .data-table th, .data-table td { border: 1px solid #333; padding: 0.75rem 1rem; text-align: left; }
-        .data-table th { background-color: #252525; font-size: 0.9rem; }
-        .data-table td { font-size: 0.95rem; }
-        .acoes a { color: #bb9a65; margin-right: 10px; }
         
         /* Estilos de Status */
         .status {
@@ -81,6 +74,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             <main class="admin-content">
                 <h1>Gerenciar Pedidos</h1>
                 
+                
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -96,7 +90,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                     <tbody>
                         <?php if (empty($pedidos)): ?>
                             <tr>
-                                <td colspan="7" style="text-align:center;">Nenhum pedido recebido ainda.</td>
+                                <td colspan="7" style="text-align:center; color: #050505ff">Nenhum pedido recebido ainda.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($pedidos as $pedido): ?>
@@ -120,7 +114,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                                         <?php endif; ?>
                                     </td>
                                     <td class="acoes">
-                                        <a href="pedido_detalhe.php?id=<?php echo $pedido['id']; ?>">Ver Detalhes</a>
+                                        <a href="pedido-detalhe.php?id=<?php echo $pedido['id']; ?>">Ver Detalhes</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

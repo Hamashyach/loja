@@ -4,7 +4,6 @@ require_once dirname(__DIR__) . '/bd/config.php';
 
 $carrinho_count = 0;
 if (!empty($_SESSION['carrinho'])) {
-    // Itera sobre o carrinho e soma o campo 'quantidade' de cada produto
     foreach ($_SESSION['carrinho'] as $item) {
         $carrinho_count += $item['quantidade'];
     }
@@ -30,32 +29,26 @@ try {
     $marcas_menu = $stmt_marcas->fetchAll(PDO::FETCH_ASSOC);
     
     $menu_data = [];
-    
-    // Mapeamento: CHAVE DO BANCO (menu_principal) => RÓTULO DE EXIBIÇÃO
-    // IMPORTANTE: As chaves devem bater com o que você salvou no 'value' do <select> no admin
+
     $itens_principais_map = [
         'ROUPAS'     => 'ROUPAS',
         'PERFUMES'   => 'PERFUMES',
-        'CALCADOS'   => 'CALÇADOS', // Chave 'CALCADOS' (sem acento), Exibição 'CALÇADOS'
+        'CALCADOS'   => 'CALÇADOS', 
         'ACESSORIOS' => 'ACESSÓRIOS',
         'MARCAS'     => 'MARCAS'
     ]; 
 
     foreach ($categorias_raw as $cat) {
         $nome = htmlspecialchars($cat['nome']);
-        // Normaliza o pai para maiúsculo para garantir o match
         $pai_raw = strtoupper($cat['menu_principal'] ?? '');
-        
-        // Verifica se o pai existe nas nossas chaves permitidas
         if (array_key_exists($pai_raw, $itens_principais_map)) {
             if (!isset($menu_data[$pai_raw])) {
                 $menu_data[$pai_raw] = [];
             }
-            // Adiciona se não for ele mesmo (evita recursão simples)
             if (strtoupper($nome) != $pai_raw) {
                 $menu_data[$pai_raw][] = [
                     'nome' => $nome, 
-                    'slug' => $cat['slug'] // Usa o slug do banco, não gera na hora!
+                    'slug' => $cat['slug'] 
                 ];
             }
         }
@@ -78,7 +71,7 @@ $cliente_logado = isset($_SESSION['cliente_logado']) && $_SESSION['cliente_logad
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/style.css">
 </head>
 <body>
-<body>
+
 
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
@@ -107,7 +100,7 @@ $cliente_logado = isset($_SESSION['cliente_logado']) && $_SESSION['cliente_logad
                       
                         
                         $submenus = $menu_data[$chave_db] ?? [];
-                        $link_pai = BASE_URL . "/produtos.php?categoria=" . strtolower($chave_db); // ex: ?categoria=roupas
+                        $link_pai = BASE_URL . "/produtos.php?categoria=" . strtolower($chave_db); 
                         ?>
 
                         <?php if ($chave_db == 'MARCAS'): ?>
@@ -192,3 +185,4 @@ $cliente_logado = isset($_SESSION['cliente_logado']) && $_SESSION['cliente_logad
             </div>
         </div>
     </header>
+ 

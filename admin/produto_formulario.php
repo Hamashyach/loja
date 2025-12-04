@@ -3,20 +3,18 @@ require_once 'auth_check.php';
 require_once '../bd/config.php';
 
 $produto_id = null;
+// Valores padrão
 $produto = [
     'nome' => '', 'descricao' => '', 'cuidados' => '', 'preco' => '', 'preco_promocional' => '',
     'sku' => '', 'estoque' => 0, 'categoria_id' => null, 'marca_id' => null,
-    'imagem_principal' => null, 'ativo' => 1, 'em_destaque_kit' => 0
+    'imagem_principal' => null, 'ativo' => 1, 'em_destaque_kit' => 0,
+    'peso_kg' => '0.300', 'altura_cm' => '5', 'largura_cm' => '20', 'comprimento_cm' => '20'
 ];
+
 $titulo_pagina = "Adicionar Novo Produto";
 $acao_formulario = "produto_processa.php?acao=novo";
+$variacoes = [];
 
-// Variáveis para controle de visualização
-$tem_variacoes = false; 
-$estoque_unico = 0;
-$variacoes_existentes = [];
-
-// Drops
 try {
     $categorias = $pdo->query("SELECT id, nome FROM tb_categorias ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
     $marcas = $pdo->query("SELECT id, nome FROM tb_marcas ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
@@ -34,25 +32,10 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         $titulo_pagina = "Editar Produto: " . htmlspecialchars($produto['nome']);
         $acao_formulario = "produto_processa.php?acao=editar&id=" . $produto_id;
 
-        // Busca Variações
-        $stmt_var = $pdo->prepare("SELECT tamanho, estoque FROM tb_produto_variacoes WHERE produto_id = ?");
+        // Busca Variações com Imagem
+        $stmt_var = $pdo->prepare("SELECT * FROM tb_produto_variacoes WHERE produto_id = ? ORDER BY id ASC");
         $stmt_var->execute([$produto_id]);
-        $variacoes_raw = $stmt_var->fetchAll(PDO::FETCH_ASSOC);
-
-        // Analisa se é Tamanho Único ('U') ou Grade
-        foreach ($variacoes_raw as $v) {
-            if ($v['tamanho'] == 'U') {
-                $estoque_unico = $v['estoque']; // É tamanho único
-                $tem_variacoes = false;
-            } else {
-                $variacoes_existentes[$v['tamanho']] = ['estoque' => $v['estoque']];
-                $tem_variacoes = true; // Tem grade (P, M, G...)
-            }
-        }
-        // Se não tiver registros na tabela variações, assumimos único com estoque 0
-        if (empty($variacoes_raw)) {
-            $tem_variacoes = false;
-        }
+        $variacoes = $stmt_var->fetchAll(PDO::FETCH_ASSOC);
 
         // Galeria
         $stmt_gal = $pdo->prepare("SELECT id, caminho_imagem FROM tb_produto_imagens WHERE produto_id = ?");
@@ -66,36 +49,51 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $titulo_pagina; ?></title>
     <link rel="stylesheet" href="css/admin_style.css">
     <style>
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        textarea.form-control { height: 150px; resize: vertical; }
-        .stock-type-selector {
-            display: flex; 
-            gap: 30px; 
-            margin-bottom: 20px; 
-            padding: 15px;
-            background: #222; 
-            border-radius: 6px; 
-            border: 1px solid #333;
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
         }
-        .stock-type-label { cursor: pointer; display: flex; align-items: center; gap: 10px; color: #fff; }
-        .stock-type-label input { accent-color: #bb9a65; width: 18px; height: 18px; margin-top: 10px; }
-        
-        /* Ocultar/Mostrar */
-        .hidden { display: none; }
 
-        /* Botões e Imagens (do seu CSS anterior) */
-        .btn-salvar { padding: 0.8rem 1.5rem; background-color: #bb9a65; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .btn-cancelar { padding: 0.8rem 1.5rem; background-color: #555; color: #fff; border-radius: 6px; text-decoration: none; margin-left: 10px; }
-        .imagem-preview { max-width: 100px; margin-top: 10px; border: 1px solid #444; }
-        .galeria-preview-container { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .galeria-item { position: relative; width: 100px; height: 100px; }
-        .galeria-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
-        .btn-apagar-img { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; text-align: center; line-height: 20px; cursor: pointer; text-decoration: none; font-size: 12px; }
+        .full-width { 
+            grid-column: 1 / -1; 
+        }
+
+        textarea.form-control { 
+            height: 120px; 
+            resize: vertical; 
+        }
+        
+        /* Variações */
+        .variations-box { 
+            background: #ffffffff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #cecbcbff; 
+            margin-top: 10px; 
+        }
+
+        .variation-row { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1fr 2fr auto; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+            align-items: center; 
+            background: #ffffffff;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .btn-remove-var { background: #e74c3c; color: white; border: none; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .var-img-preview { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #555; margin-left: 10px; vertical-align: middle; }
+        
+        /* Galeria */
+        .gallery-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .gallery-item { position: relative; width: 80px; height: 80px; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; border: 1px solid #444; }
+        .btn-delete-img { position: absolute; top: -5px; right: -5px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; text-align: center; line-height: 20px; font-size: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -126,230 +124,171 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             <h1><?php echo $titulo_pagina; ?></h1>
             
             <form action="<?php echo $acao_formulario; ?>" method="POST" enctype="multipart/form-data">
+                
                 <div class="form-grid">
-                    
-                    <div class="form-group">
-                        <label>Nome do Produto</label>
-                        <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($produto['nome']); ?>" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Preço (R$)</label>
-                        <input type="number" step="0.01" name="preco" class="form-control" value="<?php echo htmlspecialchars($produto['preco']); ?>" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>SKU (Código Único)</label>
-                        <input type="text" name="sku" class="form-control" value="<?php echo htmlspecialchars($produto['sku']); ?>" readonly style="background-color: #4b4b4bff; cursor: not-allowed;">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Categoria</label>
-                        <select name="categoria_id" class="form-control">
-                            <option value="">Selecione...</option>
-                            <?php foreach ($categorias as $cat): ?>
-                                <option value="<?php echo $cat['id']; ?>" <?php echo ($produto['categoria_id'] == $cat['id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($cat['nome']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Descrição</label>
-                        <textarea name="descricao" class="form-control"><?php echo htmlspecialchars($produto['descricao']); ?></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Detalhes e Cuidados</label>
-                        <textarea name="cuidados" class="form-control"><?php echo htmlspecialchars($produto['cuidados']); ?></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Preço Promocional</label>
-                        <input type="number" step="0.01" name="preco_promocional" class="form-control" value="<?php echo htmlspecialchars($produto['preco_promocional'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <hr style="border-color: var(--color-accent); margin: 2rem 0;">
-                        <h3>Controle de Estoque</h3>
-                        
-                        <div class="stock-type-selector">
-                            <label class="stock-type-label" style="">
-                                <input type="radio" name="tipo_estoque" value="unico" id="radio-unico" 
-                                    <?php echo (!$tem_variacoes) ? 'checked' : ''; ?> onclick="toggleEstoque('unico')">
-                                Tamanho Único (Perfumes, Acessórios)
-                            </label>
-                            <label class="stock-type-label">
-                                <input type="radio" name="tipo_estoque" value="grade" id="radio-grade" 
-                                    <?php echo ($tem_variacoes) ? 'checked' : ''; ?> onclick="toggleEstoque('grade')">
-                                Grade de Tamanhos (Roupas, Calçados)
-                            </label>
+                    <div>
+                        <div class="form-group">
+                            <label>Nome do Produto</label>
+                            <input type="text" name="nome" class="form-control" value="<?php echo htmlspecialchars($produto['nome']); ?>" required>
                         </div>
-
-                        <div id="box-estoque-unico" class="<?php echo ($tem_variacoes) ? 'hidden' : ''; ?>">
-                            <div class="form-group">
-                                <label>Quantidade em Estoque</label>
-                                <input type="number" name="estoque_unico" class="form-control" value="<?php echo $estoque_unico; ?>" min="0" style="max-width: 200px;">
-                            </div>
+                        <div class="form-group">
+                            <label>Preço (R$)</label>
+                            <input type="number" step="0.01" name="preco" class="form-control" value="<?php echo htmlspecialchars($produto['preco']); ?>" required>
                         </div>
+                        <div class="form-group">
+                            <label>Preço Promo (Opcional)</label>
+                            <input type="number" step="0.01" name="preco_promocional" class="form-control" value="<?php echo htmlspecialchars($produto['preco_promocional'] ?? ''); ?>">
+                        </div>
+                    </div>
 
-                        <div id="box-estoque-grade" class="<?php echo (!$tem_variacoes) ? 'hidden' : ''; ?>">
-                            <small style="color: #ccc; margin-bottom: 10px; display: block;">Preencha apenas os tamanhos disponíveis.</small>
-                            <div class="variation-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
-                                <?php 
-                                $tamanhos_padrao = ['P', 'M', 'G', 'GG', 'XG', '36', '37', '38', '40', '42'];
-                                foreach ($tamanhos_padrao as $tamanho): 
-                                    $estoque_val = $variacoes_existentes[$tamanho]['estoque'] ?? 0;
-                                ?>
-                                    <div class="variation-item" style="background: #222; padding: 10px; border-radius: 4px; text-align: center;">
-                                        <label style="color: var(--color-accent); font-weight: bold;"><?php echo $tamanho; ?></label>
-                                        <input type="hidden" name="variacoes[<?php echo $tamanho; ?>][tamanho]" value="<?php echo $tamanho; ?>">
-                                        <input type="number" name="variacoes[<?php echo $tamanho; ?>][estoque]" class="form-control" 
-                                            value="<?php echo $estoque_val; ?>" min="0" style="margin-top: 5px; text-align: center;">
-                                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>SKU</label>
+                            <input type="text" name="sku" class="form-control" value="<?php echo htmlspecialchars($produto['sku']); ?>" placeholder="Gerado auto se vazio">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select name="categoria_id" class="form-control">
+                                <option value="">Selecione...</option>
+                                <?php foreach ($categorias as $cat): ?>
+                                    <option value="<?php echo $cat['id']; ?>" <?php echo ($produto['categoria_id'] == $cat['id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($cat['nome']); ?>
+                                    </option>
                                 <?php endforeach; ?>
-                            </div>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Marca</label>
+                            <select name="marca_id" class="form-control">
+                                <option value="">Selecione...</option>
+                                <?php foreach ($marcas as $marca): ?>
+                                    <option value="<?php echo $marca['id']; ?>" <?php echo ($produto['marca_id'] == $marca['id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($marca['nome']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Marca</label>
-                        <select name="marca_id" class="form-control">
-                            <option value="">Selecione...</option>
-                            <?php foreach ($marcas as $marca): ?>
-                                <option value="<?php echo $marca['id']; ?>" <?php echo ($produto['marca_id'] == $marca['id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($marca['nome']); ?>
-                                </option>
+
+                    <div class="full-width">
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea name="descricao" class="form-control"><?php echo htmlspecialchars($produto['descricao']); ?></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px; color: var(--text-main); border-bottom: 1px solid #333; padding-bottom: 10px;">Informações para o cálculo de frete</h3>
+                <div class="form-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="form-group"><label>Peso (kg)</label><input type="number" step="0.001" name="peso_kg" class="form-control" value="<?php echo htmlspecialchars($produto['peso_kg']); ?>"></div>
+                    <div class="form-group"><label>Altura (cm)</label><input type="number" name="altura_cm" class="form-control" value="<?php echo htmlspecialchars($produto['altura_cm']); ?>"></div>
+                    <div class="form-group"><label>Largura (cm)</label><input type="number" name="largura_cm" class="form-control" value="<?php echo htmlspecialchars($produto['largura_cm']); ?>"></div>
+                    <div class="form-group"><label>Comp. (cm)</label><input type="number" name="comprimento_cm" class="form-control" value="<?php echo htmlspecialchars($produto['comprimento_cm']); ?>"></div>
+                </div>
+
+                <h3 style="margin-top: 30px; color: var(----text-main); border-bottom: 1px solid #333; padding-bottom: 10px;">Variações (Cores e Tamanhos)</h3>
+                <div class="variations-box">
+                    <div id="variations-list">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 2fr 40px; gap: 10px; color: var(--text-main); font-size: 0.95rem; margin-bottom: 10px; font-weight: 600;">
+                            <span>Cor / Modelo</span>
+                            <span>Tamanho</span>
+                            <span>Estoque</span>
+                            <span>Imagem da Variação</span>
+                            <span></span>
+                        </div>
+
+                        <?php if (!empty($variacoes)): ?>
+                            <?php foreach ($variacoes as $idx => $v): ?>
+                                <div class="variation-row">
+                                    <input type="text" name="variacoes[<?php echo $idx; ?>][cor]" class="form-control" value="<?php echo htmlspecialchars($v['cor_modelo']); ?>" required>
+                                    <input type="text" name="variacoes[<?php echo $idx; ?>][tamanho]" class="form-control" value="<?php echo htmlspecialchars($v['tamanho']); ?>" required>
+                                    <input type="number" name="variacoes[<?php echo $idx; ?>][estoque]" class="form-control" value="<?php echo $v['estoque']; ?>" min="0" required>
+                                    
+                                    <div style="display:flex; align-items:center;">
+                                        <input type="file" name="variacoes[<?php echo $idx; ?>][imagem]" class="form-control" accept="image/*" style="font-size: 0.8rem;">
+                                        <input type="hidden" name="variacoes[<?php echo $idx; ?>][imagem_antiga]" value="<?php echo htmlspecialchars($v['imagem'] ?? ''); ?>">
+                                        <?php if (!empty($v['imagem'])): ?>
+                                            <img src="../uploads/produtos/variacoes/<?php echo htmlspecialchars($v['imagem']); ?>" class="var-img-preview" title="Imagem Atual">
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <button type="button" class="btn-remove-var" onclick="this.parentElement.remove()">&times;</button>
+                                </div>
                             <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="ativo" class="form-control">
-                            <option value="1" <?php echo ($produto['ativo'] == 1) ? 'selected' : ''; ?>>Ativo</option>
-                            <option value="0" <?php echo ($produto['ativo'] == 0) ? 'selected' : ''; ?>>Inativo</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Destaque "Ideia de Kit"?</label>
-                        <input type="checkbox" name="em_destaque_kit" value="1" <?php echo ($produto['em_destaque_kit'] == 1) ? 'checked' : ''; ?>>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Imagem Principal</label>
-                        <input type="file" name="imagem_principal" class="form-control" accept="image/*">
-                        <?php if ($produto_id && !empty($produto['imagem_principal'])): ?>
-                            <img src="../uploads/produtos/<?php echo htmlspecialchars($produto['imagem_principal']); ?>" class="imagem-preview">
+                        <?php else: ?>
+                            <div class="variation-row">
+                                <input type="text" name="variacoes[0][cor]" class="form-control" placeholder="Ex: Azul" value="Padrão" required>
+                                <input type="text" name="variacoes[0][tamanho]" class="form-control" placeholder="Ex: M" value="U" required>
+                                <input type="number" name="variacoes[0][estoque]" class="form-control" placeholder="0" min="0" required>
+                                <div style="display:flex; align-items:center;">
+                                    <input type="file" name="variacoes[0][imagem]" class="form-control" accept="image/*" style="font-size: 0.8rem;">
+                                </div>
+                                <button type="button" class="btn-remove-var" onclick="this.parentElement.remove()">&times;</button>
+                            </div>
                         <?php endif; ?>
                     </div>
+                    <button type="button" class="btn-novo" style="margin-top: 10px;" onclick="addVariation()">+ Adicionar Variação</button>
+                </div>
 
-                    <div class="form-group full-width">
-                        <label>Galeria de Imagens</label>
+                <div class="form-grid" style="margin-top: 30px;">
+                    <div class="full-width">
+                        <label>Imagem Principal (Padrão)</label>
+                        <input type="file" name="imagem_principal" class="form-control" accept="image/*">
+                        <?php if ($produto_id && !empty($produto['imagem_principal'])): ?>
+                            <img src="../uploads/produtos/<?php echo htmlspecialchars($produto['imagem_principal']); ?>" style="max-width: 80px; margin-top: 10px; border: 1px solid #444; border-radius: 4px;">
+                        <?php endif; ?>
+                    </div>
+                    <div class="full-width">
+                        <label>Galeria Geral</label>
                         <input type="file" name="galeria_imagens[]" class="form-control" accept="image/*" multiple>
-                        <div class="galeria-preview-container">
+                        <div class="gallery-grid">
                             <?php if (!empty($imagens_galeria)): ?>
                                 <?php foreach ($imagens_galeria as $img): ?>
-                                    <div class="galeria-item">
+                                    <div class="gallery-item">
                                         <img src="../<?php echo htmlspecialchars($img['caminho_imagem']); ?>">
-                                        <a href="produto_imagem_apagar.php?id=<?php echo $img['id']; ?>&produto_id=<?php echo $produto_id; ?>" class="btn-apagar-img" onclick="return confirm('Apagar imagem?');">&times;</a>
+                                        <a href="produto_imagem_apagar.php?id=<?php echo $img['id']; ?>&produto_id=<?php echo $produto_id; ?>" class="btn-delete-img" onclick="return confirm('Apagar?');">&times;</a>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
                     </div>
+                </div>
 
-                </div> 
-                <hr style="border-color: #333; margin: 2rem 0;">
-                <button type="submit" class="btn-salvar">Salvar Produto</button>
-                <a href="produtos.php" class="btn-cancelar" style="padding: 9px 15px;">Cancelar</a>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Status</label>
+                    <select name="ativo" class="form-control" style="width: auto;">
+                        <option value="1" <?php echo ($produto['ativo'] == 1) ? 'selected' : ''; ?>>Ativo</option>
+                        <option value="0" <?php echo ($produto['ativo'] == 0) ? 'selected' : ''; ?>>Inativo</option>
+                    </select>
+                </div>
+
+                <hr style="border-color: #333; margin: 30px 0;">
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn-salvar">Salvar Produto</button>
+                    <a href="produtos.php" class="btn-cancelar">Cancelar</a>
+                </div>
             </form>
         </main>
     </div>
 </div>
 
-<div class="modal-overlay" id="modal-feedback">
-        <div class="modal-container">
-            <h3 id="modal-titulo">Aviso</h3>
-            <p id="modal-mensagem">Mensagem aqui.</p>
-            <div class="modal-buttons" style="justify-content: center;">
-                <button class="modal-btn-ok" id="modal-btn-ok">OK</button>
-            </div>
-        </div>
-    </div>
-
 <script>
-    
+    let vCount = <?php echo empty($variacoes) ? 1 : count($variacoes); ?>;
 
-
-</script>
-
-<script>
-
-    function toggleEstoque(tipo) {
-    const boxUnico = document.getElementById('box-estoque-unico');
-    const boxGrade = document.getElementById('box-estoque-grade');
-    
-    if (tipo === 'unico') {
-        boxUnico.classList.remove('hidden');
-        boxGrade.classList.add('hidden');
-        // Limpa valores da grade para evitar envio acidental
-        document.querySelectorAll('#box-estoque-grade input[type="number"]').forEach(input => input.value = 0);
-    } else {
-        boxUnico.classList.add('hidden');
-        boxGrade.classList.remove('hidden');
-        // Limpa valor único
-        document.querySelector('input[name="estoque_unico"]').value = 0;
+    function addVariation() {
+        const container = document.getElementById('variations-list');
+        const div = document.createElement('div');
+        div.className = 'variation-row';
+        div.innerHTML = `
+            <input type="text" name="variacoes[${vCount}][cor]" class="form-control" placeholder="Cor" required>
+            <input type="text" name="variacoes[${vCount}][tamanho]" class="form-control" placeholder="Tam" required>
+            <input type="number" name="variacoes[${vCount}][estoque]" class="form-control" placeholder="0" min="0" required>
+            <input type="file" name="variacoes[${vCount}][imagem]" class="form-control" accept="image/*" style="font-size: 0.8rem;">
+            <button type="button" class="btn-remove-var" onclick="this.parentElement.remove()">&times;</button>
+        `;
+        container.appendChild(div);
+        vCount++;
     }
-}
-    document.addEventListener('DOMContentLoaded', function() {
-
-        // --- LÓGICA DO MODAL DE FEEDBACK ---
-        const modalFeedback = document.getElementById('modal-feedback');
-        const modalTitulo = document.getElementById('modal-titulo');
-        const modalMensagem = document.getElementById('modal-mensagem');
-        const modalBtnOk = document.getElementById('modal-btn-ok');
-
-        function abrirModalFeedback(titulo, mensagem, tipo) {
-            if (modalFeedback) {
-                modalTitulo.textContent = titulo;
-                modalMensagem.textContent = mensagem;
-                
-                if (tipo === 'sucesso') {
-                    modalTitulo.style.color = '#28a745'; 
-                } else {
-                    modalTitulo.style.color = '#e64c4c'; 
-                }
-
-                modalFeedback.classList.add('is-open');
-            }
-        }
-
-        if (modalBtnOk) {
-            modalBtnOk.addEventListener('click', function() {
-                modalFeedback.classList.remove('is-open');
-                window.history.replaceState({}, document.title, window.location.pathname + window.location.search.split('?')[0] + "?id=" + "<?php echo $produto_id; ?>");
-            });
-        }
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        if (urlParams.has('sucesso')) {
-            abrirModalFeedback('Sucesso!', 'Produto salvo com sucesso.', 'sucesso');
-        }
-
-        if (urlParams.has('erro')) {
-            const erro = urlParams.get('erro');
-            let msg = 'Ocorreu um erro ao salvar o produto.';
-            
-            if (erro === 'dados_invalidos') msg = 'Por favor, preencha todos os campos obrigatórios (Nome, Preço, SKU).';
-            if (erro === 'erro_db') msg = 'Erro no banco de dados. Verifique se o SKU já existe.';
-            if (erro === 'upload_imagem') msg = 'Erro ao fazer upload da imagem.';
-
-            abrirModalFeedback('Erro', msg, 'erro');
-        }
-    });
-    </script>
-
+</script>
 </body>
 </html>

@@ -25,10 +25,20 @@ require 'templates/header.php';
                             <label for="sobrenome">Sobrenome</label>
                             <input type="text" id="sobrenome" name="sobrenome" required>
                         </div>
+
+                        <div class="form-group">
+                            <label for="cpf">CPF</label>
+                            <input type="text" id="cpf" name="cpf" required>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="email">E-mail</label>
                         <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contato">Contato</label>
+                        <input type="contato" id="contato" name="contato" required>
                     </div>
                 </fieldset>
 

@@ -37,37 +37,24 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             justify-content: space-between;
             align-items: center;
         }
-        .btn-novo {
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 0.6rem 1.2rem;
-            color: #000;
-            background-color: var(--color-accent, #bb9a65); /* Cor de destaque */
-            border-radius: 6px;
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-        .btn-novo:hover {
-            background-color: #a98a54;
-            text-decoration: none;
-        }
         .product-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 2rem;
-            background-color: #1a1a1a;
+            background-color: #ffffffff;
         }
         .product-table th, .product-table td {
-            border: 1px solid #333;
+            border: 1px solid #cecbcbff;
             padding: 0.75rem 1rem;
             text-align: left;
         }
         .product-table th {
-            background-color: #252525;
+            background-color: #ffffffff;
             font-size: 0.9rem;
         }
         .product-table td {
             font-size: 0.95rem;
+            font-weight: 600;
         }
         .product-table .produto-img {
             width: 50px;
@@ -75,14 +62,20 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             object-fit: cover;
             border-radius: 4px;
         }
-        .status-ativo { color: #28a745; font-weight: bold; }
-        .status-inativo { color: #e64c4c; font-weight: bold; }
-        .acoes a {
-            color: #bb9a65;
-            margin-right: 10px;
+
+        .product-table .acoes a { 
+            transition: transform 0.2s, 
+            box-shadow 0.2s; 
+            gap: 20px;
+            color: #000000ff;
+            
         }
 
-        /* Adicionar dentro do <style> em /admin/produtos.php */
+        .product-table .acoes a:hover { 
+            color: var(--color-primary); 
+            transform: translateY(-2px);
+        }
+
         .admin-alert {
             padding: 1rem;
             margin-bottom: 1.5rem;
@@ -91,7 +84,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             border: 1px solid;
         }
         .admin-alert.success {
-            background-color: #2a4a34; /* Tom de verde escuro */
+            background-color: #2a4a34; 
             color: #d1f0db;
             border-color: #28a745;
         }
@@ -137,7 +130,6 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                             echo '<div class="admin-alert success">' . htmlspecialchars($msg) . '</div>';
                         }
                     }
-                    // --- (FIM) BLOCO DE MENSAGEM DE SUCESSO ---
                     ?>
                 <h1>
                     Gerenciar Produtos
@@ -194,7 +186,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                                     </td>
                                     <td class="acoes">
                                         <a href="produto_formulario.php?id=<?php echo $produto['id']; ?>">Editar</a>
-                                        <a href="#" class="link-excluir" data-url="produto_excluir.php?id=<?php echo $produto['id']; ?>">Excluir</a>
+                                        <a href="#" class="link-excluir" data-url="produto_excluir.php?id=<?php echo $produto['id']; ?>"style= "color: red">Excluir</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -235,21 +227,19 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             modal.classList.remove('is-open');
         }
 
-        // Adiciona evento para TODOS os links de "Excluir"
         document.querySelectorAll('.link-excluir').forEach(link => {
             link.addEventListener('click', function(e) {
-                e.preventDefault(); // Impede o link de navegar
+                e.preventDefault(); 
                 const url = this.getAttribute('data-url');
                 const mensagem = 'Tem certeza que deseja INATIVAR este produto? Ele será movido para a lixeira.';
                 abrirModal(url, mensagem);
             });
         });
 
-        // Eventos dos botões do modal
         modalBtnCancelar.addEventListener('click', fecharModal);
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
-                fecharModal(); // Fecha se clicar fora da caixa
+                fecharModal(); 
             }
         });
     });

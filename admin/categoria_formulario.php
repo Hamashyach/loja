@@ -41,11 +41,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
     <title><?php echo $titulo_pagina; ?> - Painel Admin</title>
     <link rel="stylesheet" href="css/admin_style.css">
     <style>
-        .form-group label small { display: block; color: #888; font-weight: normal; margin-top: 3px; }
-        .btn-salvar { font-size: 1rem; font-weight: 600; padding: 0.8rem 1.5rem; color: #000; background-color: var(--color-accent, #bb9a65); border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
-        .btn-salvar:hover { background-color: #a98a54; }
-        .btn-cancelar { display: inline-block; padding: 0.8rem 1.5rem; background-color: #555; color: #fff; border: none; border-radius: 6px; text-decoration: none; margin-left: 10px; font-size: 1rem; font-weight: 600; }
-        .btn-cancelar:hover { background-color: #777; text-decoration: none; }
+        .form-group label small { display: block; color: #000000ff; font-weight: normal; margin-top: 3px; }
         .imagem-preview { max-width: 200px; height: auto; margin-top: 10px; border: 1px solid #444; padding: 5px; background-color: #222; }
         /* Switch CSS */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; vertical-align: middle; }
@@ -106,14 +102,14 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                     </div>
 
                     <div class="form-group">
-                        <label for="slug">URL Amigável (Slug)</label>
+                        <label for="slug">URL Amigável</label>
                         <input type="text" id="slug" name="slug" class="form-control" 
                                value="<?php echo htmlspecialchars($categoria['slug']); ?>">
                         <small>Deixe em branco para gerar automaticamente (ex: nome "Camisetas" vira "camisetas").</small>
                     </div>
 
-                    <div style="background: #222; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
-                        <h3 style="margin-top: 0; font-size: 1.1rem; color: #bb9a65;">Configuração de Destaque (Home)</h3>
+                    <div style="background: #ffffffff; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #cecbcbff;">
+                        <h3 ">Configuração de Destaque (Home)</h3>
                         
                         <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                             <label class="switch">
@@ -152,7 +148,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
 
                     <hr style="border-color: #333; margin: 2rem 0;">
 
-                    <button type="submit" class="btn-salvar">Salvar Categoria</button>
+                    <button type="submit" class="btn-salvar">Salvar</button>
                     <a href="categorias.php" class="btn-cancelar">Cancelar</a>
                 </form>
             </main>

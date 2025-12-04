@@ -2025,7 +2025,6 @@ main{
     border-left: 2px solid #bb9a65;
     padding-left: 5px;
 }
-.size-option.selected { border-color: #bb9a65; color: #bb9a65; }
 
 /* Estilo para Tamanho Selecionado no Filtro */
 .size-option {
@@ -2040,7 +2039,6 @@ main{
 
 .size-option.selected {
     border-color: #bb9a65 !important; 
-    color: #bb9a65 !important;
     font-weight: bold;
     background-color: rgba(187, 154, 101, 0.1);
 }

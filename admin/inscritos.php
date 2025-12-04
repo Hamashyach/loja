@@ -21,17 +21,6 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
     <title>Gerenciar Inscritos - Painel Admin</title>
     <link rel="stylesheet" href="css/admin_style.css">
     <style>
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background-color: #1a1a1a; }
-        .data-table th, .data-table td { border: 1px solid #333; padding: 0.75rem 1rem; text-align: left; }
-        .data-table th { background-color: #252525; font-size: 0.9rem; }
-        .data-table td { font-size: 0.95rem; }
-        .acoes a { color: #bb9a65; margin-right: 10px; }
-        .acoes .link-desativar { color: #e64c4c; }
-        .acoes .link-ativar { color: #28a745; }
-        
-        .status-ativo { color: #28a745; font-weight: bold; }
-        .status-inativo { color: #e64c4c; font-weight: bold; }
-
         /* Alerta de sucesso */
         .admin-alert { padding: 1rem; margin-bottom: 1.5rem; border-radius: 6px; font-weight: 500; border: 1px solid; }
         .admin-alert.success { background-color: #2a4a34; color: #d1f0db; border-color: #28a745; }

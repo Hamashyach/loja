@@ -18,7 +18,7 @@ if (isset($_SESSION['admin_logado'])) {
 
     <div class="login-wrapper">
         <div class="login-container">
-            <h1>Painel Admin</h1>
+            <h1>Redefinir Senha</h1>
 
             <?php
             // Mostra mensagem de erro

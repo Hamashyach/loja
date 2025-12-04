@@ -1,0 +1,6 @@
+{
+    "require": {
+        "mercadopago/dx-php": "^2.6",
+        "aws/aws-sdk-php": "^3.337"
+    }
+}

@@ -86,37 +86,23 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
     <link rel="stylesheet" href="css/admin_style.css">
     <style>
 
-        .btn-salvar {
-            font-size: 1rem; font-weight: 600; padding: 0.8rem 1.5rem; color: #000;
-            background-color: var(--color-accent, #bb9a65); border: none;
-            border-radius: 6px; cursor: pointer; transition: background-color 0.2s;
-        }
-        .btn-salvar:hover { background-color: #a98a54; }
-        
         /* Botão de Preview  */
         .btn-preview {
-            font-size: 1rem; font-weight: 600; padding: 0.8rem 1.5rem; color: #000000ff;
-            background-color: #c0c0c0ff; 
+            font-size: 1rem; font-weight: 600; padding: 0.8rem 1.5rem; color: #ffffffff;
+            background-color: #000000ff; 
             border: none; border-radius: 6px; cursor: pointer;
             margin-left: 10px; text-decoration: none;
         }
         .btn-preview:hover { background-color: #535353ff; }
 
-        .btn-cancelar {
-            display: inline-block; padding: 0.6rem 1.5rem; background-color: #555;
-            color: #fff; border: none; border-radius: 6px; text-decoration: none;
-            margin-left: 10px; font-size: 1rem; font-weight: 600; line-height: 1.5;
-        }
-        .btn-cancelar:hover { background-color: #777; text-decoration: none; }
-
         .form-section {
-            background-color: #1a1a1a; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #333;
+            background-color: #ffffffff; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #c2c2c2;
         }
         .form-section h3 {
-            font-size: 1.3rem; color: var(--color-accent, #bb9a65); border-bottom: 1px solid #444;
+            font-size: 1.3rem; color: var(--color-accent, #000000ff); border-bottom: 1px solid #444;
             padding-bottom: 10px; margin-bottom: 20px;
         }
-        .imagem-preview { max-width: 300px; height: auto; margin-top: 10px; border: 1px solid #444; padding: 5px; background-color: #222; }
+        .imagem-preview { max-width: 300px; height: auto; margin-top: 10px; border: 1px solid #c2c2c2; padding: 5px; background-color: #ffffffff; }
         
         /* Switch Toggle */
         .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
@@ -190,7 +176,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                                 <input type="checkbox" name="modal_ativo" value="1" <?php echo ($modal_ativo == '1') ? 'checked' : ''; ?>>
                                 <span class="slider"></span>
                             </label>
-                            <small style="color: #ccc; margin-left: 10px;"><?php echo ($modal_ativo == '1') ? 'Ativo' : 'Inativo'; ?></small>
+                            <small style="color: #000000ff; margin-left: 10px;"><?php echo ($modal_ativo == '1') ? 'Ativo' : 'Inativo'; ?></small>
                         </div>
                         
                         <div class="form-group">
@@ -232,7 +218,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
 
                             <label for="grid1_link" style="margin-top: 10px;">Link do Botão (Será salvo)</label>
                             <input type="text" id="grid1_link" name="grid1_link" class="form-control" value="<?php echo htmlspecialchars($grid1_link); ?>">
-                            <small style="color: #ccc;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
+                            <small style="color: #000000ff;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
                         </div>
                     </div>
 
@@ -263,7 +249,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
 
                             <label for="grid2_link" style="margin-top: 10px;">Link do Botão (Será salvo)</label>
                             <input type="text" id="grid2_link" name="grid2_link" class="form-control" value="<?php echo htmlspecialchars($grid2_link); ?>">
-                            <small style="color: #ccc;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
+                            <small style="color: #000000ff;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
                         </div>
                     </div>
 
@@ -294,7 +280,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
 
                             <label for="feature_banner_link" style="margin-top: 10px;">Link do Botão (Será salvo)</label>
                             <input type="text" id="feature_banner_link" name="feature_banner_link" class="form-control" value="<?php echo htmlspecialchars($feature_banner_link); ?>">
-                            <small style="color: #ccc;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
+                            <small style="color: #000000ff;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
                         </div>
                     </div>
 
@@ -320,12 +306,12 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                         <div class="form-group">
                             <label for="perfum_link">Link Rápido (Assistente)</label>
                             <select id="perfum_link_helper" class="form-control link-helper" data-target="perfum_link">
-                                <?php echo $link_options_html; // Nossa variável mágica ?>
+                                <?php echo $link_options_html; ?>
                             </select>
 
                             <label for="perfum_link" style="margin-top: 10px;">Link do Botão (Será salvo)</label>
                             <input type="text" id="perfum_link" name="perfum_link" class="form-control" value="<?php echo htmlspecialchars($perfum_link); ?>">
-                            <small style="color: #ccc;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
+                            <small style="color: #000000ff;">Use o seletor acima para preencher este campo, ou digite um link manualmente.</small>
                         </div>
                     </div>
 
@@ -353,7 +339,6 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-confirmacao"></div>
     <div class="modal-overlay" id="modal-informacao">
         <div class="modal-container">
             <h3 id="modal-info-titulo">Aviso</h3>
@@ -364,62 +349,17 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
         </div>
     </div>
 
-    
-    <script>
-    document.getElementById('btn-preview').addEventListener('click', function() {
-        const form = document.getElementById('config-form');
-        
-        // 1. Criamos um FormData para pegar todos os dados, INCLUINDO arquivos
-        const formData = new FormData(form);
-        
-        // 2. Enviamos os dados para um script de "Preview" via AJAX (Fetch)
-        fetch('config_preview_salvar.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .catch(error => {
-            console.error('Erro no Fetch:', error);
-            alert('Erro de script ao tentar visualizar.');
-        });
-    });
-
-    // --- (INÍCIO) NOVO CÓDIGO DO "ASSISTENTE DE LINK" ---
-    
-        // Procura por todos os dropdowns com a classe 'link-helper'
-        document.querySelectorAll('.link-helper').forEach(function(selectElement) {
-            
-            // Adiciona um evento 'change' (quando o usuário escolhe algo)
-            selectElement.addEventListener('change', function() {
-                // 1. Pega o ID do campo de texto que queremos preencher (ex: 'grid1_link')
-                const targetInputId = this.getAttribute('data-target');
-                const targetInput = document.getElementById(targetInputId);
-                
-                // 2. Se o campo de texto existir e o valor não for vazio...
-                if (targetInput && this.value !== "") {
-                    // 3. Copia o valor do dropdown para o campo de texto
-                    targetInput.value = this.value;
-                }
-            });
-        });
-    </script>
-
-    <script>
+        <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // --- Elementos do Modal de CONFIRMAÇÃO ---
         const modalConfirm = document.getElementById('modal-confirmacao');
         const modalConfirmMensagem = document.getElementById('modal-mensagem');
         const modalConfirmBtnOk = document.getElementById('modal-btn-ok');
         const modalConfirmBtnCancelar = document.getElementById('modal-btn-cancelar');
-
-        // --- Elementos do Modal de INFORMAÇÃO (NOVO) ---
         const modalInfo = document.getElementById('modal-informacao');
         const modalInfoTitulo = document.getElementById('modal-info-titulo');
         const modalInfoMensagem = document.getElementById('modal-info-mensagem');
         const modalInfoBtnOk = document.getElementById('modal-info-btn-ok');
-
-        // --- Funções de Controle do Modal de CONFIRMAÇÃO ---
+-
         function abrirModalConfirm(url, mensagem) {
             if (modalConfirm && modalConfirmMensagem && modalConfirmBtnOk) {
                 modalConfirmMensagem.textContent = mensagem;
@@ -433,7 +373,6 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             }
         }
 
-        // --- Funções de Controle do Modal de INFORMAÇÃO (NOVO) ---
         function abrirModalInfo(mensagem, titulo = 'Aviso') {
             if (modalInfo && modalInfoTitulo && modalInfoMensagem) {
                 modalInfoTitulo.textContent = titulo;
@@ -456,7 +395,6 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                 if (e.target === modalConfirm) fecharModalConfirm();
             });
         }
-        // (NOVO) Evento para fechar o modal de info
         if (modalInfoBtnOk) {
             modalInfoBtnOk.addEventListener('click', fecharModalInfo);
         }
@@ -483,22 +421,17 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                         const previewUrl = '../index.php?preview=true&t=' + new Date().getTime();
                         window.open(previewUrl, '_blank');
                         
-                        // --- SUBSTITUIÇÃO DO ALERT ---
                         const msg = 'IMPORTANTE: As alterações só serão públicas depois que você clicar em "Salvar Configurações".';
                         abrirModalInfo(msg, 'Visualização Pronta');
-                        // alert(msg); // <-- REMOVIDO
+
                         
                     } else {
-                        // --- SUBSTITUIÇÃO DO ALERT ---
                         abrirModalInfo('Erro ao tentar salvar a visualização.');
-                        // alert('Erro ao tentar salvar a visualização.'); // <-- REMOVIDO
                     }
                 })
                 .catch(error => {
                     console.error('Erro no Fetch:', error);
-                    // --- SUBSTITUIÇÃO DO ALERT ---
                     abrirModalInfo('Erro de script ao tentar visualizar. Verifique o console.');
-                    // alert('Erro de script ao tentar visualizar.'); // <-- REMOVIDO
                 });
             });
         }
@@ -522,11 +455,38 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                 e.preventDefault();
                 const url = 'config_site.php';
                 const mensagem = 'Tem certeza que deseja cancelar? Alterações não salvas serão perdidas.';
-                abrirModalConfirm(url, mensagem); // Usa o modal de CONFIRMAÇÃO
+                abrirModalConfirm(url, mensagem); 
             });
         }
 
     });
     </script>
+    <script>
+    document.getElementById('btn-preview').addEventListener('click', function() {
+        const form = document.getElementById('config-form');
+        const formData = new FormData(form);
+        fetch('config_preview_salvar.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .catch(error => {
+            console.error('Erro no Fetch:', error);
+            alert('Erro de script ao tentar visualizar.');
+        });
+    });
+        document.querySelectorAll('.link-helper').forEach(function(selectElement) {
+            selectElement.addEventListener('change', function() {
+                const targetInputId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetInputId);
+            
+                if (targetInput && this.value !== "") {
+                    targetInput.value = this.value;
+                }
+            });
+        });
+    </script>
+
+
 </body>
 </html>

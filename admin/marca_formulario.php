@@ -39,21 +39,6 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $titulo_pagina; ?> - Painel Admin</title>
     <link rel="stylesheet" href="css/admin_style.css">
-    <style>
-        .btn-salvar {
-            font-size: 1rem; font-weight: 600; padding: 0.8rem 1.5rem; color: #000;
-            background-color: var(--color-accent, #bb9a65); border: none;
-            border-radius: 6px; cursor: pointer; transition: background-color 0.2s;
-        }
-        .btn-salvar:hover { background-color: #a98a54; }
-        
-        .btn-cancelar {
-            display: inline-block; padding: 0.7rem 1.5rem; background-color: #555;
-            color: #fff; border: none; border-radius: 6px; text-decoration: none;
-            margin-left: 10px; font-size: 1rem; font-weight: 600; line-height: 1.5;
-        }
-        .btn-cancelar:hover { background-color: #777; text-decoration: none; }
-    </style>
 </head>
 <body>
 
@@ -92,10 +77,10 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                     </div>
 
                     <div class="form-group">
-                        <label for="slug">Slug (URL amigável)</label>
+                        <label for="slug">URL amigável</label>
                         <input type="text" id="slug" name="slug" class="form-control" 
                                value="<?php echo htmlspecialchars($marca['slug']); ?>">
-                        <small style="color: #ccc;">Deixe em branco para gerar automaticamente a partir do nome.</small>
+                        <small style="color: #000000ff; font-size: 0.85em;">Deixe em branco para gerar automaticamente a partir do nome.</small>
                     </div>
 
                     <div class="form-group">

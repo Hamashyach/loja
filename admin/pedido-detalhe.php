@@ -15,7 +15,9 @@ try {
                 p.*, 
                 c.cliente_nome, 
                 c.cliente_sobrenome,
-                c.cliente_email
+                c.cliente_email,
+                c.cliente_contato,
+                c.cliente_cpf
             FROM 
                 tb_pedidos p
             JOIN 
@@ -122,8 +124,8 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                 <a href="pedidos.php" class="active">Pedidos</a> <a href="produtos.php">Produtos</a>
                 <a href="categorias.php">Categorias</a>
                 <a href="marcas.php">Marcas</a>
-                 <a href="clientes.php">Clientes</a>
-                 <a href="inscritos.php">Inscritos</a>
+                <a href="clientes.php">Clientes</a>
+                <a href="inscritos.php">Inscritos</a>
                 <a href="config_site.php">Config. do Site</a>
             </nav>
         </aside>
@@ -137,17 +139,17 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             </header>
 
             <main class="admin-content">
-                <h1>Detalhes do Pedido #<?php echo $pedido['id']; ?></h1>
-
+                <div class="title-product-detalhe" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1>Detalhes do Pedido #<?php echo $pedido['id']; ?></h1>
+                    <a href="pedidos.php" class="btn-cancelar">Voltar</a>
+                </div>
                 <?php
-                // --- (INÍCIO) BLOCO DE MENSAGEM ---
                 if (isset($_GET['sucesso']) && $_GET['sucesso'] == '1') {
                     echo '<div class="admin-alert success">Status do pedido atualizado com sucesso!</div>';
                 }
                 if (isset($_GET['erro']) && $_GET['erro'] == 'atualizar') {
                     echo '<div class="admin-alert error">Erro ao atualizar o status do pedido.</div>';
                 }
-                // --- (FIM) BLOCO DE MENSAGEM ---
                 ?>
 
                 <p style="color: #ccc; margin-top: -15px; margin-bottom: 20px;">
@@ -186,7 +188,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                             </tbody>
                         </table>
                         <h3 style="text-align: right; margin-top: 20px;">
-                            Valor Total: 
+                            Total Com Frete: 
                             <span style="color: var(--color-accent); font-size: 1.5rem;">
                                 R$ <?php echo number_format($pedido['valor_total'], 2, ',', '.'); ?>
                             </span>
@@ -198,7 +200,9 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                             <h2>Cliente</h2>
                             <div class="details-list">
                                 <p><strong>Nome:</strong> <?php echo htmlspecialchars($pedido['cliente_nome'] . ' ' . $pedido['cliente_sobrenome']); ?></p>
+                                <p><strong>CPF:</strong> <?php echo htmlspecialchars($pedido['cliente_cpf']); ?></p>
                                 <p><strong>Email:</strong> <?php echo htmlspecialchars($pedido['cliente_email']); ?></p>
+                                <p><strong>Contato:</strong> <?php echo htmlspecialchars($pedido['cliente_contato']); ?></p>
                             </div>
                         </div>
 
@@ -214,32 +218,20 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                             </div>
                         </div>
                         
-                        <div class="box" style="margin-top: 20px;">
-                            <h2>Atualizar Status</h2>
-                            <form action="pedido_atualizar.php" method="POST" class="status-form">
-                                <input type="hidden" name="pedido_id" value="<?php echo $pedido['id']; ?>">
-                                
-                                <div class="form-group">
-                                    <label for="status_pagamento">Status do Pagamento</label>
-                                    <select name="status_pagamento" id="status_pagamento" class="form-control">
-                                        <option value="Aguardando Pagamento" <?php echo ($pedido['status_pagamento'] == 'Aguardando Pagamento') ? 'selected' : ''; ?>>Aguardando Pagamento</option>
-                                        <option value="Pago" <?php echo ($pedido['status_pagamento'] == 'Pago') ? 'selected' : ''; ?>>Pago</option>
-                                        <option value="Cancelado" <?php echo ($pedido['status_pagamento'] == 'Cancelado') ? 'selected' : ''; ?>>Cancelado</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="status_entrega">Status da Entrega</label>
-                                    <select name="status_entrega" id="status_entrega" class="form-control">
-                                        <option value="Nao Enviado" <?php echo ($pedido['status_entrega'] == 'Nao Enviado') ? 'selected' : ''; ?>>Não Enviado</option>
-                                        <option value="Em Separacao" <?php echo ($pedido['status_entrega'] == 'Em Separacao') ? 'selected' : ''; ?>>Em Separação</option>
-                                        <option value="Enviado" <?php echo ($pedido['status_entrega'] == 'Enviado') ? 'selected' : ''; ?>>Enviado</option>
-                                        <option value="Entregue" <?php echo ($pedido['status_entrega'] == 'Entregue') ? 'selected' : ''; ?>>Entregue</option>
-                                    </select>
-                                </div>
-                                
-                                <button type="submit" class="btn-salvar">Atualizar Pedido</button>
-                            </form>
+                        <div class="box" style="margin-top: 20px; border: 1px solid #bb9a65;">
+                            <h2 style="color: #bb9a65;">Logística (Melhor Envio)</h2>
+                            
+                            <?php if (!empty($pedido['etiqueta_url'])): ?>
+                                <a href="<?php echo $pedido['etiqueta_url']; ?>" target="_blank" class="btn-salvar" style="background: #28a745; text-align:center; display:block; text-decoration:none; color: white;">
+                                     Imprimir Etiqueta Já Gerada
+                                </a>
+                            <?php elseif ($pedido['status_pagamento'] == 'Pago'): ?>
+                                <a href="etiqueta_gerar.php?id=<?php echo $pedido['id']; ?>" class="btn-salvar" style="text-align:center; display:block; text-decoration:none;">
+                                     Gerar Etiqueta de Envio
+                                </a>
+                            <?php else: ?>
+                                <p style="color: #ccc; font-size: 0.9rem;">A etiqueta só pode ser gerada após o pagamento ser aprovado.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
 

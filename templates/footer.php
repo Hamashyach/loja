@@ -100,7 +100,6 @@
     <div id="toast" class="toast-notification"></div>
 
     <script src="<?php echo BASE_URL; ?>/js/script.js"></script>
-    <script src="<?php echo BASE_URL; ?>/js/script-product-details.js"></script>
     <script src="<?php echo BASE_URL; ?>/js/script-carousel-product.js"></script>
     <script src="<?php echo BASE_URL; ?>/js/script_menu.js"></script>
     <script src="<?php echo BASE_URL; ?>/js/script_modal.js"></script>

@@ -20,12 +20,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
     <link rel="stylesheet" href="css/admin_style.css">
     <style>
         .admin-content h1 { display: flex; justify-content: space-between; align-items: center; }
-        .btn-novo { font-size: 0.9rem; font-weight: 600; padding: 0.6rem 1.2rem; color: #000; background-color: var(--color-accent, #bb9a65); border-radius: 6px; text-decoration: none; transition: background-color 0.2s; }
-        .btn-novo:hover { background-color: #a98a54; text-decoration: none; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background-color: #1a1a1a; }
-        .data-table th, .data-table td { border: 1px solid #333; padding: 0.75rem 1rem; text-align: left; }
-        .data-table th { background-color: #252525; font-size: 0.9rem; }
-        .data-table td { font-size: 0.95rem; }
+     
         .status-ativo { color: #28a745; font-weight: bold; }
         .status-inativo { color: #e64c4c; font-weight: bold; }
         .acoes a { color: #bb9a65; margin-right: 10px; }
@@ -96,7 +91,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                                         <?php endif; ?>
                                     </td>
                                     <td class="acoes">
-                                        <a href="marca_formulario.php?id=<?php echo $marca['id']; ?>">Editar</a>
+                                        <a href="marca_formulario.php?id=<?php echo $marca['id']; ?>" style="color: red;">Editar</a>
                                         <a href="#" class="link-excluir" 
                                            data-url="marca_excluir.php?id=<?php echo $marca['id']; ?>">Excluir</a>
                                     </td>

@@ -21,16 +21,18 @@ if ($acao == 'dados') {
     $nome = $_POST['nome'] ?? '';
     $sobrenome = $_POST['sobrenome'] ?? '';
     $email = $_POST['email'] ?? '';
+    $contato = $_POST['contato'] ?? '';
+    $cpf = $_POST['cpf'] ?? '';
 
-    if (empty($nome) || empty($sobrenome) || empty($email)) {
+    if (empty($nome) || empty($sobrenome) || empty($email) || empty($contato) || empty($cpf)) {
         header("Location: perfil.php?erro=nome_vazio#dados-panel");
         exit;
     }
 
     try {
-        $sql = "UPDATE tb_client_users SET cliente_nome = ?, cliente_sobrenome = ?, cliente_email= ? WHERE id = ?";
+        $sql = "UPDATE tb_client_users SET cliente_nome = ?, cliente_sobrenome = ?, cliente_email = ?, cliente_contato = ?, cliente_cpf = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$nome, $sobrenome, $email, $cliente_id]);
+        $stmt->execute([$nome, $sobrenome, $email, $contato, $cpf, $cliente_id]);
 
         $_SESSION['cliente_nome'] = $nome;
 

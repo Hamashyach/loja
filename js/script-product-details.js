@@ -11,7 +11,7 @@ function selectSize(element) {
     
     const estoque = parseInt(element.getAttribute('data-stock'));
     const stockDisplay = document.getElementById('stock-display');
-    const qtyInput = document.getElementById('quantity-input');
+    const qtyInput = document.getElementById('qty');
     const btnCompra = document.getElementById('btn-compra');
 
     if (estoque > 0) {

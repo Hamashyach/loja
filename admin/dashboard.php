@@ -52,41 +52,35 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
             margin-bottom: 30px;
         }
         .stat-card {
-            background-color: #1a1a1a;
+            background-color: #ffffffff;
             padding: 25px;
             border-radius: 8px;
-            border: 1px solid #333;
         }
         .stat-card h3 {
             font-size: 1rem;
-            color: #ccc;
+            color: #000000ff;
             text-transform: uppercase;
             margin-bottom: 10px;
         }
         .stat-card .stat-value {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #fff;
+            color: #000000ff;
         }
         .stat-card .stat-value.currency {
-            color: var(--color-accent, #bb9a65);
+            color: var(--color-accent, #015305ff);
         }
         
         .section-title {
             font-size: 1.5rem;
             font-weight: 600;
-            color: #fff;
+            color: #000000ff;
             margin-bottom: 20px;
             border-bottom: 1px solid #333;
             padding-bottom: 10px;
         }
         
-        /* Reutiliza o CSS da tabela de pedidos */
-        .data-table { width: 100%; border-collapse: collapse; background-color: #1a1a1a; }
-        .data-table th, .data-table td { border: 1px solid #333; padding: 0.75rem 1rem; text-align: left; }
-        .data-table th { background-color: #252525; font-size: 0.9rem; }
-        .data-table td { font-size: 0.95rem; }
-        .data-table .acoes a { color: #bb9a65; }
+        
     </style>
 </head>
 <body>
@@ -126,8 +120,8 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                         <p class="stat-value"><?php echo $total_para_enviar ?? 0; ?></p>
                     </div>
                     <div class="stat-card">
-                        <h3>Pag. Pendentes</h3>
-                        <p class="stat-value"><?php echo $total_pendentes ?? 0; ?></p>
+                        <h3>Pagamentos Pendentes</h3>
+                        <p class="stat-value" style="color: #720707ff;"><?php echo $total_pendentes ?? 0; ?></p>
                     </div>
                     <div class="stat-card">
                         <h3>Total de Clientes</h3>
@@ -149,7 +143,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                     <tbody>
                         <?php if (empty($ultimos_pedidos)): ?>
                             <tr>
-                                <td colspan="5" style="text-align:center;">Nenhum pedido recebido ainda.</td>
+                                <td colspan="5" style="text-align:center; color: #000000ff;">Nenhum pedido recebido ainda.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($ultimos_pedidos as $pedido): ?>
@@ -159,7 +153,7 @@ $admin_nome = $_SESSION['admin_nome'] ?? 'Admin';
                                     <td><?php echo htmlspecialchars($pedido['cliente_nome'] . ' ' . $pedido['cliente_sobrenome']); ?></td>
                                     <td>R$ <?php echo number_format($pedido['valor_total'], 2, ',', '.'); ?></td>
                                     <td class="acoes">
-                                        <a href="pedido_detalhe.php?id=<?php echo $pedido['id']; ?>">Ver Detalhes</a>
+                                        <a href="pedido-detalhe.php?id=<?php echo $pedido['id']; ?>">Ver Detalhes</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

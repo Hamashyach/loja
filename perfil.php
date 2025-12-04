@@ -159,10 +159,21 @@ if (!$cliente) {
                                         <label for="sobrenome">Sobrenome</label>
                                         <input type="text" id="sobrenome" name="sobrenome" value="<?php echo htmlspecialchars($cliente['cliente_sobrenome']); ?>" required>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="cpf">CPF</label>
+                                        <input type="text" id="cpf" name="cpf" value="<?php echo htmlspecialchars($cliente['cliente_cpf']); ?>" required>
+                                    </div>
+                                    
+
                                 </div>
                                 <div class="form-group">
                                     <label for="email">E-mail</label>
                                     <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($cliente['cliente_email']); ?>">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="contato">Contato</label>
+                                    <input type="contato" id="contato" name="contato" value="<?php echo htmlspecialchars($cliente['cliente_contato'] ?? ''); ?> " placeholder="(00) 00000-0000">
                                 </div>
                             </fieldset>
                             <button type="submit" class="submit-btn">Salvar Alterações</button>
